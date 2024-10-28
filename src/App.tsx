@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Container } from "./components/Container";
 import { Content } from "./components/Content";
 import { Filters } from "./components/Filters";
@@ -6,22 +6,23 @@ import { Form } from "./components/Form";
 import { Item } from "./components/Item";
 import { List } from "./components/List";
 import { useLocalStorage } from "usehooks-ts";
+import { listenTasks, Todo } from "./firebase";
 
-type Todo = {
-  text: string
-  completed: boolean
-}
+
 
 export function App() {
-  const [lista, setLista] = useLocalStorage<Todo[]>("tarefas", [])
+  const [lista, setLista] = useState<Todo[]>([])
   const [filter, setFilter] = useLocalStorage<"all" | "completed" | "uncompleted">("filtro", "all")
 
-  const addTask = (task: string) => {
-    setLista([
-      ...lista,
-      { text: task, completed: false }
-    ])
-  }
+  useEffect(() => {
+    const umount = listenTasks((tasks) => {
+      setLista(tasks)
+    })
+
+    return () => {
+      umount()
+    }
+  }, [])
 
   const listaFiltrada = useMemo(() => {
     if (filter === "all") {
@@ -37,21 +38,13 @@ export function App() {
     <Container>
       <Content>
         <h1 className="text-white text-lg font-bold">Workshop React 2024</h1>
-        <Form onSubmit={addTask} />
+        <Form />
         <Filters filter={filter} setFilter={setFilter} />
         <List>
-          {listaFiltrada.map((item, index) => (
+          {listaFiltrada.map((item) => (
             <Item
-              text={item.text}
-              completed={item.completed}
-              onClick={() => {
-                setLista(lista.map((itemX, indexX) => {
-                  if (index === indexX) {
-                    return { ...itemX, completed: !itemX.completed }
-                  }
-                  return itemX
-                }))
-              }}
+              key={`task-${item.id}`}
+              task={item}
             />
           ))}
         </List>

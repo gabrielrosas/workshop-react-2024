@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { Plus } from "./icons/plus";
-type FormProps = {
-    onSubmit: (text: string) => void
-}
+import { addTask } from "../firebase";
 
-export function Form(props: FormProps) {
+export function Form() {
     const [state, setState] = useState("");
 
     return (
@@ -12,7 +10,7 @@ export function Form(props: FormProps) {
             <form onSubmit={(event) => {
                 event.preventDefault();
                 if (state) {
-                    props.onSubmit(state);
+                    addTask(state);
                     setState("");
                 }
             }}>

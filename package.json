@@ -6,10 +6,12 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "deploy": "cp -r dist/* servidor/public/ && cd servidor && firebase deploy",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "firebase": "^11.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "usehooks-ts": "^3.1.0"
